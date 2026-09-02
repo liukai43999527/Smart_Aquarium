@@ -1,0 +1,5 @@
+../Core/Src/OneWire.c:3:15:OneWire_Init	1
+../Core/Src/OneWire.c:16:6:OneWire_SendBit	3
+../Core/Src/OneWire.c:32:9:OneWire_ReceiveBit	1
+../Core/Src/OneWire.c:44:6:OneWire_SendByte	2
+../Core/Src/OneWire.c:53:9:OneWire_ReceiveByte	3

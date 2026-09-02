@@ -1,0 +1,2 @@
+../Core/Src/DS18B20.c:5:6:DS18B20_ConvertT	8	static
+../Core/Src/DS18B20.c:13:7:DS18B20_Read_T	16	static
