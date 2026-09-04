@@ -25,6 +25,8 @@
 #include "Delay_us.h"
 #include "OneWire.h"
 #include "DS18B20.h"
+#include "UART_Connect.h"
+#include "Devices_Control.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,7 +52,10 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim6;
 
+UART_HandleTypeDef huart1;
+
 /* USER CODE BEGIN PV */
+
 uint16_t data_TIM2_CH2_PWM_OC=0;
 uint16_t data_TIM2_CH3_PWM_OC=0;
 volatile uint16_t data_TIM3_IT=0;
@@ -58,6 +63,8 @@ uint32_t ADC1_data_1 = 0;
 volatile uint8_t ADC1_Get_Data1_Flag=1;
 float Temperature_data_1 = 0;
 volatile uint8_t Temperature_Get_Data1_Flag=1;
+
+volatile uint8_t UART_Data;
 
 /* USER CODE END PV */
 
@@ -68,6 +75,8 @@ static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM6_Init(void);
+static void MX_USART1_UART_Init(void);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -110,6 +119,7 @@ int main(void)
   MX_TIM3_Init();
   MX_ADC1_Init();
   MX_TIM6_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim3);
 
@@ -122,10 +132,11 @@ int main(void)
   HAL_ADC_Start(&hadc1);
 
   DS18B20_ConvertT();
+  Devices_Init();
+  UART_StartReceive();
 
-  HAL_GPIO_WritePin(GPIOG,LED_Pin,GPIO_PIN_SET);
-  HAL_GPIO_WritePin(GPIOG,heater_Pin,GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(GPIOG,pump_Pin,GPIO_PIN_RESET);
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -134,25 +145,61 @@ int main(void)
 
   while (1)
   {
-	  OneWire_SendByte(0xCC);
-	  HAL_Delay(100);
-	  OneWire_SendByte(0x44);
-	  HAL_Delay(1000);
+
+
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
 
 
 	 if(ADC1_Get_Data1_Flag==1)
 	 {
 		 ADC1_Get_Data1_Flag=0;
-		 Get_ADC1_Data();
+		 //Get_ADC1_Data();
 	 }
 	 if(Temperature_Get_Data1_Flag==1)
 	 {
 		 Temperature_Get_Data1_Flag=0;
-		 Temperature_data_1=DS18B20_Read_T();
+		 //Temperature_data_1=DS18B20_Read_T();
 	 }
-    /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
+
+	 if(UART_RX_Flag == 1)
+	 {
+	     UART_RX_Flag = 0;
+	     if(strcmp((char *)UART_RX_Buffer, "Light:ON") == 0)
+	     {
+	         UART_SendString(" ON\n");
+	         Light_ON();
+	     }
+	     else if(strcmp((char *)UART_RX_Buffer, "Light:OFF") == 0)
+	     {
+	         UART_SendString(" OFF\n");
+	         Light_OFF();
+	     }
+	     else
+	     {
+	         UART_SendString("NO MATCH\n");
+	     }
+	 }
+
+
+/*
+	 if(UART_RX_Flag == 1)
+	 {
+	     UART_RX_Flag = 0;
+
+	     if(strcmp(UART_RX_Buffer, "Light:ON") == 0)
+	     {
+	         Light_ON();
+	     }
+	     else if(strcmp(UART_RX_Buffer, "Light:OFF") == 0)
+	     {
+	         Light_OFF();
+	     }
+	 }
+*/
+
   }
   /* USER CODE END 3 */
 }
@@ -401,6 +448,39 @@ static void MX_TIM6_Init(void)
 }
 
 /**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -443,18 +523,27 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+
+//TIM3为程序主计时器，依据该时钟发送数据信息，采集数据
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim->Instance == TIM3)
 	 {
 		data_TIM3_IT++;
 
+		if(data_TIM3_IT==250)
+		{
+			//HAL_GPIO_TogglePin(GPIOG, LED_Pin);
+			//UART_SendString("Pump:OFF\n");
+		}
+		if(data_TIM3_IT==500)
+		{
+			Temperature_Get_Data1_Flag=1;
+		}
 		if(data_TIM3_IT==1000)
 		{
-
-			HAL_GPIO_TogglePin(GPIOG, LED_Pin);
 			ADC1_Get_Data1_Flag=1;
-			Temperature_Get_Data1_Flag=1;
 			data_TIM3_IT=0;
 		}
 	 }

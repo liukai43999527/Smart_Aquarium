@@ -70,6 +70,10 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 
+extern volatile uint8_t UART_Data;
+extern UART_HandleTypeDef huart1;
+
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
