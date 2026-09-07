@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <String.h>
 #include "Delay_us.h"
 #include "OneWire.h"
 #include "DS18B20.h"
@@ -64,7 +65,14 @@ volatile uint8_t ADC1_Get_Data1_Flag=1;
 float Temperature_data_1 = 0;
 volatile uint8_t Temperature_Get_Data1_Flag=1;
 
-volatile uint8_t UART_Data;
+char* Pump_status="Pump_OFF";
+char* Heater_status="Heater_OFF";
+char* Light_status="Light_OFF";
+char* Feed_status="Feed_OFF";
+
+
+
+
 
 /* USER CODE END PV */
 
@@ -167,20 +175,82 @@ int main(void)
 	 if(UART_RX_Flag == 1)
 	 {
 	     UART_RX_Flag = 0;
-	     if(strcmp((char *)UART_RX_Buffer, "Light:ON") == 0)
+
+	     if(strcmp((char *)UART_Data, "Light:ON") == 0)
 	     {
-	         UART_SendString(" ON\n");
+	         UART_SendString("Light:ON#");
 	         Light_ON();
 	     }
-	     else if(strcmp((char *)UART_RX_Buffer, "Light:OFF") == 0)
+	     else if(strcmp((char *)UART_Data, "Light:OFF") == 0)
 	     {
-	         UART_SendString(" OFF\n");
+	         UART_SendString("Light:OFF#");
 	         Light_OFF();
 	     }
+	     else if(strcmp((char *)UART_Data, "Pump:ON") == 0)
+	     {
+	     	 UART_SendString("Pump:ON#");
+	     	 Pump_ON();
+	     }
+	     else if(strcmp((char *)UART_Data, "Pump:OFF") == 0)
+	     {
+	     	 UART_SendString("Pump:OFF#");
+	     	 Pump_OFF();
+	     }
+	     else if(strcmp((char *)UART_Data, "Heater:ON") == 0)
+	     {
+	     	 UART_SendString("Heater:ON#");
+	     	 Heater_ON();
+	     }
+	     else if(strcmp((char *)UART_Data, "Heater:OFF") == 0)
+	     {
+	         UART_SendString("Heater:OFF#");
+	     	 Heater_OFF();
+	     }
+	     else if(strcmp((char *)UART_Data, "Feed:ON") == 0)
+		 {
+			 UART_SendString("Feed:ON#");
+			 Feed_ON();
+		 }
+	     else if(strcmp((char *)UART_Data, "Get_Light") == 0)
+		 {
+	    	 char ADC_Data_String[20];
+			 sprintf(ADC_Data_String, "LIGHT:%lu", ADC1_data_1);
+			 UART_SendString(ADC_Data_String);
+
+		 }
+		 else if(strcmp((char *)UART_Data, "Get_Temperature") == 0)
+		 {
+			 char Temperature_data_1_String[20];
+			 sprintf(Temperature_data_1_String, "TEMP:%lu", (long unsigned int)Temperature_data_1);
+			 UART_SendString(Temperature_data_1_String);
+		 }
+		 else if(strcmp((char *)UART_Data, "Pump:status") == 0)
+		 {
+			 UART_SendStatus(Pump_status);
+		 }
+		 else if(strcmp((char *)UART_Data, "Heater:status") == 0)
+		 {
+			 UART_SendStatus(Heater_status);
+		 }
+		 else if(strcmp((char *)UART_Data, "Light:status") == 0)
+		 {
+			 UART_SendStatus(Light_status);
+		 }
+		 else if(strcmp((char *)UART_Data, "Feed:status") == 0)
+		 {
+			 UART_SendStatus(Feed_status);
+		 }
 	     else
 	     {
-	         UART_SendString("NO MATCH\n");
+	         //UART_SendString("FailedToReceive#");
+	    	 //char UART_data_1_String[64];
+			 //sprintf(UART_data_1_String, "Rx:%lu", (long unsigned int)UART_Data);
+			 //UART_SendString(UART_data_1_String);
 	     }
+	     for(uint8_t i=0; i < sizeof(UART_Data)-1; i++)
+		{
+	    	 UART_Data[i]=0;
+		}
 	 }
 
 

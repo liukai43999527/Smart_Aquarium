@@ -1,3 +1,4 @@
-../Core/Src/UART_Connect.c:10:6:UART_StartReceive	1
-../Core/Src/UART_Connect.c:34:6:HAL_UART_RxCpltCallback	6
-../Core/Src/UART_Connect.c:72:6:UART_SendString	1
+../Core/Src/UART_Connect.c:11:6:UART_StartReceive	1
+../Core/Src/UART_Connect.c:35:6:HAL_UART_RxCpltCallback	5
+../Core/Src/UART_Connect.c:73:6:UART_SendString	1
+../Core/Src/UART_Connect.c:78:6:UART_SendStatus	1

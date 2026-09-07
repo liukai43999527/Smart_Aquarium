@@ -7,11 +7,11 @@ void Devices_Init(void);
 
 void Light_ON(void);
 void Light_OFF(void);
-void heater_ON(void);
-void heater_OFF(void);
+void Heater_ON(void);
+void Heater_OFF(void);
 void Pump_ON(void);
 void Pump_OFF(void);
-
+void Feed_ON(void);
 
 
 

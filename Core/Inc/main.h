@@ -70,9 +70,11 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 
-extern volatile uint8_t UART_Data;
 extern UART_HandleTypeDef huart1;
-
+extern	char* Pump_status;
+extern	char* Heater_status;
+extern	char* Light_status;
+extern	char* Feed_status;
 
 /* USER CODE END Private defines */
 
