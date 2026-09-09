@@ -43,7 +43,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 void Get_ADC1_Data(void);
-
+void decide_UART_1(void);
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -174,101 +174,10 @@ int main(void)
 
 	 if(UART_RX_Flag == 1)
 	 {
-	     UART_RX_Flag = 0;
-
-	     if(strcmp((char *)UART_Data, "Light:ON") == 0)
-	     {
-	         UART_SendString("Light:ON#");
-	         Light_ON();
-	     }
-	     else if(strcmp((char *)UART_Data, "Light:OFF") == 0)
-	     {
-	         UART_SendString("Light:OFF#");
-	         Light_OFF();
-	     }
-	     else if(strcmp((char *)UART_Data, "Pump:ON") == 0)
-	     {
-	     	 UART_SendString("Pump:ON#");
-	     	 Pump_ON();
-	     }
-	     else if(strcmp((char *)UART_Data, "Pump:OFF") == 0)
-	     {
-	     	 UART_SendString("Pump:OFF#");
-	     	 Pump_OFF();
-	     }
-	     else if(strcmp((char *)UART_Data, "Heater:ON") == 0)
-	     {
-	     	 UART_SendString("Heater:ON#");
-	     	 Heater_ON();
-	     }
-	     else if(strcmp((char *)UART_Data, "Heater:OFF") == 0)
-	     {
-	         UART_SendString("Heater:OFF#");
-	     	 Heater_OFF();
-	     }
-	     else if(strcmp((char *)UART_Data, "Feed:ON") == 0)
-		 {
-			 UART_SendString("Feed:ON#");
-			 Feed_ON();
-		 }
-	     else if(strcmp((char *)UART_Data, "Get_Light") == 0)
-		 {
-	    	 char ADC_Data_String[20];
-			 sprintf(ADC_Data_String, "LIGHT:%lu", ADC1_data_1);
-			 UART_SendString(ADC_Data_String);
-
-		 }
-		 else if(strcmp((char *)UART_Data, "Get_Temperature") == 0)
-		 {
-			 char Temperature_data_1_String[20];
-			 sprintf(Temperature_data_1_String, "TEMP:%lu", (long unsigned int)Temperature_data_1);
-			 UART_SendString(Temperature_data_1_String);
-		 }
-		 else if(strcmp((char *)UART_Data, "Pump:status") == 0)
-		 {
-			 UART_SendStatus(Pump_status);
-		 }
-		 else if(strcmp((char *)UART_Data, "Heater:status") == 0)
-		 {
-			 UART_SendStatus(Heater_status);
-		 }
-		 else if(strcmp((char *)UART_Data, "Light:status") == 0)
-		 {
-			 UART_SendStatus(Light_status);
-		 }
-		 else if(strcmp((char *)UART_Data, "Feed:status") == 0)
-		 {
-			 UART_SendStatus(Feed_status);
-		 }
-	     else
-	     {
-	         //UART_SendString("FailedToReceive#");
-	    	 //char UART_data_1_String[64];
-			 //sprintf(UART_data_1_String, "Rx:%lu", (long unsigned int)UART_Data);
-			 //UART_SendString(UART_data_1_String);
-	     }
-	     for(uint8_t i=0; i < sizeof(UART_Data)-1; i++)
-		{
-	    	 UART_Data[i]=0;
-		}
+		 decide_UART_1();
 	 }
 
 
-/*
-	 if(UART_RX_Flag == 1)
-	 {
-	     UART_RX_Flag = 0;
-
-	     if(strcmp(UART_RX_Buffer, "Light:ON") == 0)
-	     {
-	         Light_ON();
-	     }
-	     else if(strcmp(UART_RX_Buffer, "Light:OFF") == 0)
-	     {
-	         Light_OFF();
-	     }
-	 }
-*/
 
   }
   /* USER CODE END 3 */
@@ -605,7 +514,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		if(data_TIM3_IT==250)
 		{
 			//HAL_GPIO_TogglePin(GPIOG, LED_Pin);
-			//UART_SendString("Pump:OFF\n");
+			//UART_SendString("Pump:OFF#");
 		}
 		if(data_TIM3_IT==500)
 		{
@@ -630,6 +539,87 @@ void Get_ADC1_Data(void)
 
 	HAL_ADC_Stop(&hadc1);
 
+}
+
+void decide_UART_1(void)
+{
+	 UART_RX_Flag = 0;
+
+	 if(strcmp((char *)UART_Data, "Light:ON") == 0)
+	 {
+		 UART_SendString("Light_ON#");
+		 Light_ON();
+	 }
+	 if(strcmp((char *)UART_Data, "Light:OFF") == 0)
+	 {
+		 UART_SendString("Light_OFF#");
+		 Light_OFF();
+	 }
+	 if(strcmp((char *)UART_Data, "Pump:ON") == 0)
+	 {
+		 UART_SendString("Pump_ON#");
+		 Pump_ON();
+	 }
+	 if(strcmp((char *)UART_Data, "Pump:OFF") == 0)
+	 {
+		 UART_SendString("Pump_OFF#");
+		 Pump_OFF();
+	 }
+	 if(strcmp((char *)UART_Data, "Heater:ON") == 0)
+	 {
+		 UART_SendString("Heater_ON#");
+		 Heater_ON();
+	 }
+	 if(strcmp((char *)UART_Data, "Heater:OFF") == 0)
+	 {
+		 UART_SendString("Heater_OFF#");
+		 Heater_OFF();
+	 }
+	 if(strcmp((char *)UART_Data, "Feed:ON") == 0)
+	 {
+		 UART_SendString("Feed_ON#");
+		 Feed_ON();
+	 }
+	 if(strcmp((char *)UART_Data, "Get_Light") == 0)
+	 {
+		 char ADC_Data_String[20];
+		 sprintf(ADC_Data_String, "LIGHT:%lu", ADC1_data_1);
+		 UART_SendString(ADC_Data_String);
+
+	 }
+	 if(strcmp((char *)UART_Data, "Get_Temperature") == 0)
+	 {
+		 char Temperature_data_1_String[20];
+		 sprintf(Temperature_data_1_String, "TEMP:%lu", (long unsigned int)Temperature_data_1);
+		 UART_SendString(Temperature_data_1_String);
+	 }
+	 if(strcmp((char *)UART_Data, "Pump:status") == 0)
+	 {
+		 UART_SendStatus(Pump_status);
+	 }
+	 if(strcmp((char *)UART_Data, "Heater:status") == 0)
+	 {
+		 UART_SendStatus(Heater_status);
+	 }
+	 if(strcmp((char *)UART_Data, "Light:status") == 0)
+	 {
+		 UART_SendStatus(Light_status);
+	 }
+	 if(strcmp((char *)UART_Data, "Feed:status") == 0)
+	 {
+		 UART_SendStatus(Feed_status);
+	 }
+	 else
+	 {
+		 //UART_SendString("FailedToReceive#");
+		 //char UART_data_1_String[64];
+		 //sprintf(UART_data_1_String, "Rx:%lu", (long unsigned int)UART_Data);
+		 //UART_SendString(UART_data_1_String);
+	 }
+	 for(uint8_t i=0; i < sizeof(UART_Data)-1; i++)
+	{
+		 UART_Data[i]=0;
+	}
 }
 /* USER CODE END 4 */
 
