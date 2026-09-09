@@ -12,7 +12,7 @@ void MQTT_Init_loop();
 
 void MQTT_connect();
 void MQTT_callback(char* topic, byte* payload, unsigned int length);
-
+void MQTT_Publish(const char*Toptic,const char*payload);
 
 #endif
 

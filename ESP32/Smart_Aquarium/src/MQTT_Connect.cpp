@@ -2,7 +2,7 @@
 
 
 // ==================== MQTT ====================
-const char* MQTT_SERVER = "192.168.169.109";
+const char* MQTT_SERVER = "192.168.121.110";
 const int MQTT_PORT = 1883;
 
 
@@ -43,21 +43,15 @@ void MQTT_connect()
             mqttClient.subscribe("aquarium/control/light");
             mqttClient.subscribe("aquarium/control/feeder");
             mqttClient.subscribe("aquarium/control/heater");
-
-            /*
+      
             mqttClient.subscribe("aquarium/status/pump");
             mqttClient.subscribe("aquarium/status/heater");
             mqttClient.subscribe("aquarium/status/light");
             mqttClient.subscribe("aquarium/status/feeder");
-            */
-            
-
         }
         else
         {
             OLED_ShowString(3,0,"failed");
-            //Serial.print("failed, state=");
-            //Serial.println(mqttClient.state());
             i++;
             if(i>2)
             {
@@ -108,8 +102,6 @@ void MQTT_callback(char* topic, byte* payload, unsigned int length)
         }
     }
 
-    /*
-
     // ==================== 水泵 ====================
     else if (strcmp(topic, "aquarium/control/pump") == 0)
     {
@@ -151,11 +143,13 @@ void MQTT_callback(char* topic, byte* payload, unsigned int length)
             // Feeder_Run();
         }
     }
-    */
 
-    
 }
 
-
+void MQTT_Publish(const char*Toptic,const char*payload)
+{
+    mqttClient.publish(Toptic,payload);
+    mqttClient.publish("aquarium/status/light", "1020");
+}
 
 

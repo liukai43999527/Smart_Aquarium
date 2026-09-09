@@ -4,7 +4,7 @@ uart_t*uart_1=NULL;
 
 void UART_Init_setup()
 {
-    uart_1=uartBegin(1, 9600, SERIAL_8N1,RX_Pin,TX_Pin,256,256,false, 112);
+    uart_1=uartBegin(1, 115200, SERIAL_8N1,RX_Pin,TX_Pin,256,256,false, 112);
 }
 
 
@@ -51,7 +51,7 @@ String UART_ReceiveString()
      while (uartAvailable(uart_1) > 0)
     {
         char c = uartRead(uart_1);
-        if (c == '\n')
+        if (c == '#')
         {
             //Serial.println(RX_Data);
            return RX_Data;
