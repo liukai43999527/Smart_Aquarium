@@ -5,6 +5,7 @@
 #include "MQTT_Connect.h"
 #include "UART_Connect.h"
 #include "OLED.h"
+#include "Global.h"
 #define LED_PIN 12
 String RX_data="";
 
@@ -13,7 +14,7 @@ String Light_Status="OFF";
 String Heater_Status="OFF";
 String Feed_Status="OFF";
 
-String Temperature="26";
+String Temperature="10";
 String Light="1023";
 
 hw_timer_t *timer_1 =NULL;
@@ -83,41 +84,49 @@ void decide_UART_1(void)
     {
         OLED_ShowString(4,0,"Pump_ON");
         Pump_Status="ON";
+        MQTT_Publish("aquarium/control/pump","Pump_ON");
     }
     if(RX_data=="Pump_OFF")
     {
         OLED_ShowString(4,0,"Pump_OFF");
         Pump_Status="OFF";
+        MQTT_Publish("aquarium/control/pump","Pump_OFF");
     }
     if(RX_data=="Heater_ON")
     {
         OLED_ShowString(4,0,"Heater_ON");
         Heater_Status="ON";
+        MQTT_Publish("aquarium/control/heater","Heater_ON");
     }
     if(RX_data=="Heater_OFF")
     {
         OLED_ShowString(4,0,"Heater_OFF");
         Heater_Status="OFF";
+        MQTT_Publish("aquarium/control/heater","Heater_OFF");
     }
     if(RX_data=="Light_ON")
     {
         OLED_ShowString(4,0,"Light_ON");
         Light_Status="ON";
+        MQTT_Publish("aquarium/control/light","Heater_ON");
     }
     if(RX_data=="Light_OFF")
     {
         OLED_ShowString(4,0,"Light_OFF");
         Light_Status="OFF";
+        MQTT_Publish("aquarium/control/light","Heater_OFF");
     }
     if(RX_data=="Feed_ON")
     {
         OLED_ShowString(4,0,"Feed_ON");
         Feed_Status="ON";
+        MQTT_Publish("aquarium/control/feeder","Feed_ON");
     }
     if(RX_data=="Feed_OFF")
     {
         OLED_ShowString(4,0,"Feed_OFF");
         Feed_Status="OFF";
+        MQTT_Publish("aquarium/control/feeder","Feed_OFF");
     }
     if (RX_data.startsWith("TEMP:"))
     {

@@ -1,6 +1,6 @@
 #include "MQTT_Connect.h"
-
-
+#include "Global.h"
+#include "UART_Connect.h"
 // ==================== MQTT ====================
 const char* MQTT_SERVER = "192.168.121.110";
 const int MQTT_PORT = 1883;
@@ -44,10 +44,10 @@ void MQTT_connect()
             mqttClient.subscribe("aquarium/control/feeder");
             mqttClient.subscribe("aquarium/control/heater");
       
-            mqttClient.subscribe("aquarium/status/pump");
-            mqttClient.subscribe("aquarium/status/heater");
-            mqttClient.subscribe("aquarium/status/light");
-            mqttClient.subscribe("aquarium/status/feeder");
+            //mqttClient.subscribe("aquarium/status/pump");
+            //mqttClient.subscribe("aquarium/status/heater");
+            //mqttClient.subscribe("aquarium/status/light");
+            //mqttClient.subscribe("aquarium/status/feeder");
         }
         else
         {
@@ -87,17 +87,14 @@ void MQTT_callback(char* topic, byte* payload, unsigned int length)
         if (message == "ON")
         {
             digitalWrite(LED_PIN, HIGH);
-            //Serial.println("LED ON");
-            
-            mqttClient.publish( "aquarium/status/light", "LED ON");
-            //Serial.println("LED ON published!");
-
+            UART_SendString("Light:ON#");     
+            //mqttClient.publish( "aquarium/status/light", "LED ON");
         }
         else if (message == "OFF")
         {
             digitalWrite(LED_PIN, LOW);
-            //Serial.println("LED OFF");
-            mqttClient.publish( "aquarium/status/light", "LED OFF");
+            UART_SendString("Light:OFF#");     
+           // mqttClient.publish( "aquarium/status/light", "LED OFF");
             //Serial.println("LED OFF published!");
         }
     }
@@ -107,12 +104,12 @@ void MQTT_callback(char* topic, byte* payload, unsigned int length)
     {
         if (message == "ON")
         {
-            //Serial.println("PUMP ON");
+            UART_SendString("Pump:ON#");     
             // Pump_On();
         }
         else if (message == "OFF")
         {
-            //Serial.println("PUMP OFF");
+             UART_SendString("Pump:OFF#");
             // Pump_Off();
         }
     }
@@ -123,12 +120,12 @@ void MQTT_callback(char* topic, byte* payload, unsigned int length)
     {
         if (message == "ON")
         {
-            //Serial.println("HEATER ON");
+            UART_SendString("Heater:ON#");
             // Heater_On();
         }
         else if (message == "OFF")
         {
-            //Serial.println("HEATER OFF");
+            UART_SendString("Heater:OFF#");
             // Heater_Off();
         }
     }
@@ -139,17 +136,38 @@ void MQTT_callback(char* topic, byte* payload, unsigned int length)
     {
         if (message == "FEED")
         {
-            //Serial.println("FEED");
+            UART_SendString("Feed:ON#");
             // Feeder_Run();
         }
     }
+
+ // ==================== 亮度 ====================
+    else if (strcmp(topic, "aquarium/sensor/light") == 0)
+    {
+        if (message == "Light")
+        {
+            String Lig=(String)"Light:"+Light;
+            MQTT_Publish("aquarium/sensor/light",Lig.c_str());
+        }
+    }
+
+// ==================== 温度 ====================
+    else if (strcmp(topic, "aquarium/sensor/temperature") == 0)
+    {
+        if (message == "Tep")
+        {
+            String Tep=(String)"Tep:"+Temperature;
+           MQTT_Publish("aquarium/sensor/temperature",Tep.c_str());
+        }
+    }
+
 
 }
 
 void MQTT_Publish(const char*Toptic,const char*payload)
 {
     mqttClient.publish(Toptic,payload);
-    mqttClient.publish("aquarium/status/light", "1020");
+    //mqttClient.publish("aquarium/status/light", "1020");
 }
 
 
