@@ -12,7 +12,11 @@ void Heater_OFF(void);
 void Pump_ON(void);
 void Pump_OFF(void);
 void Feed_ON(void);
+void Feed_OFF(void);
+void Fan_ON(void);
+void Fan_OFF(void);
 
+void PWM_SetDuty(long unsigned int duty);
 
 
 

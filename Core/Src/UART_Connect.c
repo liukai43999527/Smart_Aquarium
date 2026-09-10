@@ -1,5 +1,6 @@
 #include "UART_Connect.h"
 #include <stdio.h>
+#include <stdlib.h>
 uint8_t UART_RX_Data;
 volatile uint8_t UART_RX_Index = 0;
 volatile char UART_RX_Buffer[64];
@@ -81,4 +82,25 @@ void UART_SendStatus(const char *status)
 
     sprintf(buffer, "%s#", status);
     UART_SendString(buffer);
+}
+
+void UART_Send_Light_data(uint32_t data)
+{
+	char UART_data_1_String[64];
+	sprintf(UART_data_1_String, "LIGHT:%lu", (long unsigned int)data);
+	UART_SendString(UART_data_1_String);
+}
+
+void UART_Send_Tep_data(float data)
+{
+	char UART_data_2_String[64];
+
+	    int temp10 = (int)(data * 10.0f);
+
+	    sprintf(UART_data_2_String,
+	            "TEMP:%d.%d#",
+	            temp10 / 10,
+	            abs(temp10 % 10));
+
+	    UART_SendString(UART_data_2_String);
 }

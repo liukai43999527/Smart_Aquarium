@@ -60,18 +60,21 @@ UART_HandleTypeDef huart1;
 uint16_t data_TIM2_CH2_PWM_OC=0;
 uint16_t data_TIM2_CH3_PWM_OC=0;
 volatile uint16_t data_TIM3_IT=0;
-uint32_t ADC1_data_1 = 0;
-volatile uint8_t ADC1_Get_Data1_Flag=1;
-float Temperature_data_1 = 0;
+volatile uint16_t data_TIM3_Second_IT=0;
 volatile uint8_t Temperature_Get_Data1_Flag=1;
+volatile uint8_t ADC1_Get_Data1_Flag=1;
+
+uint32_t ADC1_data_1 = 0;
+float Temperature_data_1 = 12.3;
+
 
 char* Pump_status="Pump_OFF";
 char* Heater_status="Heater_OFF";
 char* Light_status="Light_OFF";
 char* Feed_status="Feed_OFF";
 
-
-
+volatile uint8_t Feed_Flag=0;
+volatile uint8_t UART_Send_Light_Flag=0;
 
 
 /* USER CODE END PV */
@@ -84,7 +87,6 @@ static void MX_TIM3_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM6_Init(void);
 static void MX_USART1_UART_Init(void);
-
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -153,7 +155,10 @@ int main(void)
 
   while (1)
   {
-
+	  //PWM_SetDuty(50);
+	 // HAL_Delay(1000);
+	  //PWM_SetDuty(250);
+	  //HAL_Delay(1000);
 
     /* USER CODE END WHILE */
 
@@ -163,7 +168,7 @@ int main(void)
 	 if(ADC1_Get_Data1_Flag==1)
 	 {
 		 ADC1_Get_Data1_Flag=0;
-		 //Get_ADC1_Data();
+		 Get_ADC1_Data();
 	 }
 	 if(Temperature_Get_Data1_Flag==1)
 	 {
@@ -171,13 +176,22 @@ int main(void)
 		 //Temperature_data_1=DS18B20_Read_T();
 	 }
 
-
+	 //接收指令，根据指令行动
 	 if(UART_RX_Flag == 1)
 	 {
 		 decide_UART_1();
 	 }
 
-
+	 if(Feed_Flag==2)
+	 {
+		 Feed_Flag=0;
+		 Feed_OFF();
+	 }
+	 if(UART_Send_Light_Flag==1)
+	 {
+		 UART_Send_Light_Flag=0;
+		 UART_Send_Light_data(ADC1_data_1);
+	 }
 
   }
   /* USER CODE END 3 */
@@ -251,8 +265,8 @@ static void MX_ADC1_Init(void)
   hadc1.Instance = ADC1;
   hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = DISABLE;
-  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.ScanConvMode = ENABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
@@ -332,6 +346,7 @@ static void MX_TIM2_Init(void)
   {
     Error_Handler();
   }
+  sConfigOC.Pulse = 1000;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   {
     Error_Handler();
@@ -480,7 +495,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(OneWire_DQ_GPIO_Port, OneWire_DQ_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, LED_Pin|heater_Pin|pump_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOG, Fan_Pin|LED_Pin|heater_Pin|pump_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : OneWire_DQ_Pin */
   GPIO_InitStruct.Pin = OneWire_DQ_Pin;
@@ -489,8 +504,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(OneWire_DQ_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LED_Pin heater_Pin pump_Pin */
-  GPIO_InitStruct.Pin = LED_Pin|heater_Pin|pump_Pin;
+  /*Configure GPIO pins : Fan_Pin LED_Pin heater_Pin pump_Pin */
+  GPIO_InitStruct.Pin = Fan_Pin|LED_Pin|heater_Pin|pump_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -511,6 +526,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	 {
 		data_TIM3_IT++;
 
+
+		//毫秒计时器
 		if(data_TIM3_IT==250)
 		{
 			//HAL_GPIO_TogglePin(GPIOG, LED_Pin);
@@ -523,7 +540,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		if(data_TIM3_IT==1000)
 		{
 			ADC1_Get_Data1_Flag=1;
+			data_TIM3_Second_IT++;
+			Feed_Flag++;
 			data_TIM3_IT=0;
+		}
+
+		//秒计时器
+		if(data_TIM3_Second_IT==5&&data_TIM3_IT==0)
+		{
+			UART_Send_Light_data(ADC1_data_1);
+		}
+		if(data_TIM3_Second_IT==10&&data_TIM3_IT==0)
+		{
+			UART_Send_Tep_data(Temperature_data_1);
+			data_TIM3_Second_IT=0;
 		}
 	 }
 
@@ -535,8 +565,11 @@ void Get_ADC1_Data(void)
 {
 	HAL_ADC_Start(&hadc1);
 
-	ADC1_data_1 = HAL_ADC_GetValue(&hadc1);
-
+	//ADC1_data_1 = HAL_ADC_GetValue(&hadc1);
+	if (HAL_ADC_PollForConversion(&hadc1, 1000) == HAL_OK)
+	{
+		ADC1_data_1 = HAL_ADC_GetValue(&hadc1);
+	}
 	HAL_ADC_Stop(&hadc1);
 
 }

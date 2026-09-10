@@ -1,4 +1,6 @@
-../Core/Src/UART_Connect.c:11:6:UART_StartReceive	8	static
-../Core/Src/UART_Connect.c:35:6:HAL_UART_RxCpltCallback	24	static
-../Core/Src/UART_Connect.c:73:6:UART_SendString	16	static
-../Core/Src/UART_Connect.c:78:6:UART_SendStatus	48	static
+../Core/Src/UART_Connect.c:12:6:UART_StartReceive	8	static
+../Core/Src/UART_Connect.c:36:6:HAL_UART_RxCpltCallback	24	static
+../Core/Src/UART_Connect.c:74:6:UART_SendString	16	static
+../Core/Src/UART_Connect.c:79:6:UART_SendStatus	48	static
+../Core/Src/UART_Connect.c:87:6:UART_Send_Light_data	80	static
+../Core/Src/UART_Connect.c:94:6:UART_Send_Tep_data	96	static

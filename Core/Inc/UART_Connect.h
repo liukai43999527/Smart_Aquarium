@@ -15,5 +15,7 @@ void UART_StartReceive(void);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void UART_SendString(const char *data);
 void UART_SendStatus(const char *status);
+void UART_Send_Light_data(uint32_t data);
+void UART_Send_Tep_data(float data);
 
 #endif

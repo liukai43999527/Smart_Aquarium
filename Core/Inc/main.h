@@ -61,6 +61,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define OneWire_DQ_Pin GPIO_PIN_7
 #define OneWire_DQ_GPIO_Port GPIOA
+#define Fan_Pin GPIO_PIN_10
+#define Fan_GPIO_Port GPIOG
 #define LED_Pin GPIO_PIN_11
 #define LED_GPIO_Port GPIOG
 #define heater_Pin GPIO_PIN_12
@@ -71,11 +73,12 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 
 extern UART_HandleTypeDef huart1;
+extern TIM_HandleTypeDef htim2;
 extern	char* Pump_status;
 extern	char* Heater_status;
 extern	char* Light_status;
 extern	char* Feed_status;
-
+extern volatile uint8_t Feed_Flag;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
