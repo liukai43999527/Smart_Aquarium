@@ -173,7 +173,7 @@ int main(void)
 	 if(Temperature_Get_Data1_Flag==1)
 	 {
 		 Temperature_Get_Data1_Flag=0;
-		 //Temperature_data_1=DS18B20_Read_T();
+		 Temperature_data_1=DS18B20_Read_T();
 	 }
 
 	 //接收指令，根据指令行动
@@ -495,7 +495,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(OneWire_DQ_GPIO_Port, OneWire_DQ_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, Fan_Pin|LED_Pin|heater_Pin|pump_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOG, Fan_Pin|LED_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOG, heater_Pin|pump_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin : OneWire_DQ_Pin */
   GPIO_InitStruct.Pin = OneWire_DQ_Pin;
@@ -607,6 +610,16 @@ void decide_UART_1(void)
 	 {
 		 UART_SendString("Heater_OFF#");
 		 Heater_OFF();
+	 }
+	 if(strcmp((char *)UART_Data, "Fan:ON") == 0)
+	 {
+		 UART_SendString("Fan_ON#");
+		 Fan_ON();
+	 }
+	 if(strcmp((char *)UART_Data, "Fan:OFF") == 0)
+	 {
+		 UART_SendString("Fan_OFF#");
+		Fan_OFF();
 	 }
 	 if(strcmp((char *)UART_Data, "Feed:ON") == 0)
 	 {

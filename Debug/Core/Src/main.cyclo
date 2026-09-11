@@ -6,7 +6,7 @@
 ../Core/Src/main.c:411:13:MX_TIM6_Init	3
 ../Core/Src/main.c:449:13:MX_USART1_UART_Init	2
 ../Core/Src/main.c:482:13:MX_GPIO_Init	1
-../Core/Src/main.c:523:6:HAL_TIM_PeriodElapsedCallback	8
-../Core/Src/main.c:564:6:Get_ADC1_Data	2
-../Core/Src/main.c:577:6:decide_UART_1	15
-../Core/Src/main.c:663:6:Error_Handler	1
+../Core/Src/main.c:526:6:HAL_TIM_PeriodElapsedCallback	8
+../Core/Src/main.c:567:6:Get_ADC1_Data	2
+../Core/Src/main.c:580:6:decide_UART_1	17
+../Core/Src/main.c:676:6:Error_Handler	1

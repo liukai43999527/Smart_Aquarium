@@ -6,7 +6,7 @@
 ../Core/Src/main.c:411:13:MX_TIM6_Init	16	static
 ../Core/Src/main.c:449:13:MX_USART1_UART_Init	8	static
 ../Core/Src/main.c:482:13:MX_GPIO_Init	40	static
-../Core/Src/main.c:523:6:HAL_TIM_PeriodElapsedCallback	16	static
-../Core/Src/main.c:564:6:Get_ADC1_Data	8	static
-../Core/Src/main.c:577:6:decide_UART_1	56	static
-../Core/Src/main.c:663:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:526:6:HAL_TIM_PeriodElapsedCallback	16	static
+../Core/Src/main.c:567:6:Get_ADC1_Data	8	static
+../Core/Src/main.c:580:6:decide_UART_1	56	static
+../Core/Src/main.c:676:6:Error_Handler	4	static,ignoring_inline_asm
