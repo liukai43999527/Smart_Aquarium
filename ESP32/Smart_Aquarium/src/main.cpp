@@ -50,6 +50,8 @@ void loop()
         Publish_Flag=false;
         digitalWrite(LED_PIN, HIGH);
         MQTT_Publish("aquarium/status/light",Light.c_str());
+        String Tep=(String)"Tep:"+Temperature;
+        MQTT_Publish("aquarium/sensor/temperature",Tep.c_str());
     }
    
     if( uartAvailable(uart_1)>0)

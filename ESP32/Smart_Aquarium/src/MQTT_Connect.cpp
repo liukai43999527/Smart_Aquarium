@@ -2,7 +2,7 @@
 #include "Global.h"
 #include "UART_Connect.h"
 // ==================== MQTT ====================
-const char* MQTT_SERVER = "192.168.121.110";
+const char* MQTT_SERVER = "192.168.45.110";
 const int MQTT_PORT = 1883;
 
 
@@ -41,9 +41,10 @@ void MQTT_connect()
 
             mqttClient.subscribe("aquarium/control/pump");
             mqttClient.subscribe("aquarium/control/light");
-            mqttClient.subscribe("aquarium/control/feeder");
+            mqttClient.subscribe("aquarium/control/feed");
             mqttClient.subscribe("aquarium/control/heater");
-      
+            mqttClient.subscribe("aquarium/control/fan");
+           
             //mqttClient.subscribe("aquarium/status/pump");
             //mqttClient.subscribe("aquarium/status/heater");
             //mqttClient.subscribe("aquarium/status/light");
@@ -130,11 +131,25 @@ void MQTT_callback(char* topic, byte* payload, unsigned int length)
         }
     }
 
+    // ==================== 风扇 ====================
+    else if (strcmp(topic, "aquarium/control/fan") == 0)
+    {
+        if (message == "ON")
+        {
+            UART_SendString("Fan:ON#");
+            // Heater_On();
+        }
+        else if (message == "OFF")
+        {
+            UART_SendString("Fan:OFF#");
+            // Heater_Off();
+        }
+    }
 
     // ==================== 喂食器 ====================
-    else if (strcmp(topic, "aquarium/control/feeder") == 0)
+    else if (strcmp(topic, "aquarium/control/feed") == 0)
     {
-        if (message == "FEED")
+        if (message == "ON")
         {
             UART_SendString("Feed:ON#");
             // Feeder_Run();
